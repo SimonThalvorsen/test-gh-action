@@ -37,10 +37,20 @@ jobs:
           sudo dpkg -i ~/.cfengine/cf-remote/packages/cfengine-nova-hub*.deb
       - name: Extract new syntax-description
         run: |
-          printf "NEW_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(sudo cf-promises --syntax-description json)" >> $GITHUB_ENV
+          {
+            echo "NEW_SYNTAX_DESCRIPTION<<EOF"
+            sudo cf-promises --syntax-description json
+            echo "EOF"
+          } >> $GITHUB_ENV
       - name: Get old syntax-description
+        # run: |
+        #   printf "OLD_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(cat ./cfengine-community/syntax-description.json)" >> $GITHUB_ENV
         run: |
-          printf "OLD_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(cat ./cfengine-community/syntax-description.json)" >> $GITHUB_ENV
+          {
+            echo "OLD_SYNTAX_DESCRIPTION<<EOF"
+            cat ./cfengine-community/syntax-description.json >> $GITHUB_ENV
+            echo "EOF"
+          } >> $GITHUB_ENV
       - name: Set Git user
         run: |
           git config user.name 'github-actions[bot]'
