@@ -33,13 +33,14 @@ jobs:
           python -m pip install cf-remote
       - name: Install cfengine
         run: |
-          sudo -E python -m cf-remote --version master install --hub localhost --bootstrap localhost --edition enterprise
+          cf-remote --version master download --edition enterprise ubuntu24 amd64 hub
+          sudo dpkg -i ~/.cfengine/cf-remote/packages/cfengine-nova-hub*.deb
       - name: Extract new syntax-description
         run: |
-          echo "NEW_SYNTAX_DESCRIPTION=$(sudo cf-promises --syntax-description json)" >> $GITHUB_ENV
+          printf "NEW_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(sudo cf-promises --syntax-description json)" >> $GITHUB_ENV
       - name: Get old syntax-description
         run: |
-          echo "OLD_SYNTAX_DESCRIPTION=$(cat ./cfengine-community/syntax-description.json)" >> $GITHUB_ENV
+          printf "OLD_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(cat ./cfengine-community/syntax-description.json)" >> $GITHUB_ENV
       - name: Set Git user
         run: |
           git config user.name 'github-actions[bot]'
