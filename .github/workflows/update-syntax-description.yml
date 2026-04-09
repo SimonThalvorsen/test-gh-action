@@ -38,48 +38,23 @@ jobs:
 
       - name: Extract new syntax-description
         run: |
-          # Corrected EOF usage to output to GITHUB_ENV
-          {
-            echo "NEW_SYNTAX_DESCRIPTION<<EOF"
+          (
             sudo cf-promises --syntax-description json
-            echo "EOF"
-          } >> $GITHUB_ENV
-
-      - name: Get old syntax-description
-        run: |
-          # Corrected syntax to read file into GITHUB_ENV
-          {
-            echo "OLD_SYNTAX_DESCRIPTION<<EOF"
-            cat ./cfengine-community/syntax-description.json
-            echo "EOF"
-          } >> $GITHUB_ENV
-      #
-      # - name: Extract new syntax-description
-      #   run: |
-      #     {
-      #       echo "NEW_SYNTAX_DESCRIPTION<<EOF"
-      #       sudo cf-promises --syntax-description json
-      #       echo "EOF"
-      #     } >> $GITHUB_ENV
-      # - name: Get old syntax-description
-      #   # run: |
-      #   #   printf "OLD_SYNTAX_DESCRIPTION<<EOF\n%s\nEOF\n" "$(cat ./cfengine-community/syntax-description.json)" >> $GITHUB_ENV
-      #   run: |
-      #     {
-      #       echo "OLD_SYNTAX_DESCRIPTION<<EOF"
-      #       cat ./cfengine-community/syntax-description.json >> $GITHUB_ENV
-      #       echo "EOF"
-      #     } >> $GITHUB_ENV
+          ) > new.json
+          echo "" >> new.json
       - name: Set Git user
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Update contents of syntax-description
-        if: env.OLD_SYNTAX_DESCRIPTION != env.NEW_SYNTAX_DESCRIPTION
         run: |
-          echo "$env.OLD_SYNTAX_DESCRIPTION" > ./cfengine-community/syntax-description.json
+          if ! cmp -s new.json ./cfengine-community/syntax-description.json; then
+                      cat new.json > ./cfengine-community/syntax-description.json
+                      echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+                      rm new.json
+                    fi
       - name: Create Pull Request
-        if: env.OLD_SYNTAX_DESCRIPTION != env.NEW_SYNTAX_DESCRIPTION
+        if: env.CHANGES_DETECTED ==  'true'
         uses: cfengine/create-pull-request@v6
         with:
           title: Updated syntax-description.json
