@@ -1601,6 +1601,13 @@
           "type": "slist",
           "visibility": "body"
         },
+        "smtpport": {
+          "attribute": "smtpport",
+          "range": "0,10080",
+          "status": "normal",
+          "type": "int",
+          "visibility": "body"
+        },
         "smtpserver": {
           "attribute": "smtpserver",
           "range": ".*",
@@ -3258,7 +3265,13 @@
       "status": "normal"
     },
     "common": {
-      "promiseTypes": ["classes", "defaults", "meta", "reports", "vars"],
+      "promiseTypes": [
+        "classes",
+        "defaults",
+        "meta",
+        "reports",
+        "vars"
+      ],
       "status": "normal"
     },
     "edit_line": {
